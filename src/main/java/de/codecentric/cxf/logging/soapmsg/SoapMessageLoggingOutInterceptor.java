@@ -4,8 +4,6 @@ import de.codecentric.cxf.logging.BaseLogger;
 import org.apache.cxf.interceptor.LoggingMessage;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 /**
@@ -63,8 +61,17 @@ public class SoapMessageLoggingOutInterceptor extends LoggingOutInterceptor {
 
     private String extractSoapMessageForElasticSearchProcessing(LoggingMessage loggingMessage) {
         // Only write the Payload (SOAP-Xml) to Logger
-        if (loggingMessage.getPayload().length() > 0) {
-            LOG.logOutboundSoapMessage(loggingMessage.getPayload().toString().replaceAll("(?<=<dtypes:Data xmime:contentType=\"application/pdf\">)[^><]+(?=</dtypes:Data>)", "PdfFiltered"));
+        final StringBuilder payload = loggingMessage.getPayload();
+        if (payload.length() > 0) {
+            int start = -1;
+            while((start = payload.indexOf("xmime:contentType=\"application/pdf\"")) > 0){
+                int end = payload.indexOf("</", start);
+                if(end < 1){
+                    end = payload.length();
+                }
+                payload.replace(start, end, ">PDF Filtered by cxf-spring-boot-starter</");
+            }
+            LOG.logOutboundSoapMessage(payload.toString());
         }
 
         // This is just hook into CXF and get the SOAP-Message.
