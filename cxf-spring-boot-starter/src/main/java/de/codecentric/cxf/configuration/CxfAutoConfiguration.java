@@ -5,10 +5,12 @@ import de.codecentric.cxf.autodetection.WebServiceScanner;
 import de.codecentric.cxf.common.BootStarterCxfException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBus;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -51,6 +53,12 @@ public class CxfAutoConfiguration {
 
     @Value("${cxf.servicelist.title:CXF SpringBoot Starter - service list}")
     private String serviceListTitle;
+
+    @Autowired(required = false)
+    private Feature loggingFeature;
+
+    @Value("${soap.messages.logging:false}")
+    private boolean soapMessagesLogging;
 
     private String serviceUrlEnding = "";
     private Object seiImplementation;
@@ -111,6 +119,12 @@ public class CxfAutoConfiguration {
         return seiImplementation;
     }
 
+    private void activateEndpointFeatures(EndpointImpl endpoint) {
+        if(soapMessagesLogging && loggingFeature != null){
+            endpoint.getFeatures().add(loggingFeature);
+        }
+    }
+
     @Bean
     @ConditionalOnProperty(name = "endpoint.autoinit", matchIfMissing = true)
     public Endpoint endpoint() throws BootStarterCxfException {
@@ -118,6 +132,7 @@ public class CxfAutoConfiguration {
         LOG.info("Autodetection successful. Initializing javax.xml.ws.Endpoint based on " + seiImplementation().getClass().getName());
 
         EndpointImpl endpoint = new EndpointImpl(springBus(), seiImplementation());
+        activateEndpointFeatures(endpoint);
         // CXF JAX-WS implementation relies on the correct ServiceName as QName-Object with
         // the name-Attribute´s text <wsdl:service name="Weather"> and the targetNamespace
         // "http://www.codecentric.de/namespace/weatherservice/"

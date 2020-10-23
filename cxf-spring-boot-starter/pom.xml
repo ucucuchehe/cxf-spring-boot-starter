@@ -83,6 +83,11 @@
 			<artifactId>cxf-rt-transports-http</artifactId>
 			<version>${cxf.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-features-logging</artifactId>
+			<version>${cxf.version}</version>
+		</dependency>
 		<!-- Apache CXF from Java 11 on - see https://stackoverflow.com/questions/55476331/tomcat8-5-and-openjdk11-noclassdeffounderror-could-not-initialize-class-org-apa -->
 		<dependency>
 			<groupId>com.sun.activation</groupId>

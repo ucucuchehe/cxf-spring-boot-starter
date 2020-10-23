@@ -1,7 +1,6 @@
 package de.codecentric.soap.configuration;
 
-import de.codecentric.cxf.logging.soapmsg.SoapMessageLoggingInInterceptor;
-import de.codecentric.cxf.logging.soapmsg.SoapMessageLoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.interceptor.AbstractLoggingInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import de.codecentric.cxf.common.BootStarterCxfException;
 import de.codecentric.cxf.configuration.CxfAutoConfiguration;
 import de.codecentric.cxf.soaprawclient.SoapRawClient;
 import de.codecentric.namespace.weatherservice.WeatherService;
+import org.springframework.http.MediaType;
 
 @Configuration
 @PropertySource("classpath:dev-test.properties")
@@ -40,27 +40,18 @@ public class CxfBootSimpleTestConfiguration {
         JaxWsProxyFactoryBean jaxWsFactory = new JaxWsProxyFactoryBean();
         jaxWsFactory.setServiceClass(WeatherService.class);
         jaxWsFactory.setAddress(buildUrl());
-        jaxWsFactory.getInInterceptors().add(logInInterceptorClientSoapMsgLogger());
-        jaxWsFactory.getOutInterceptors().add(logOutInterceptorClientSoapMsgLogger());
+        jaxWsFactory.getFeatures().add(loggingFeature());
         return (WeatherService) jaxWsFactory.create();
     }
 
     @Bean
-    public AbstractLoggingInterceptor logInInterceptorClientSoapMsgLogger() {
-        SoapMessageLoggingInInterceptor logInInterceptor = new SoapMessageLoggingInInterceptor();
-        logInInterceptor.logSoapMessage(true);
-        logInInterceptor.setPrettyLogging(true);
-        return logInInterceptor;
+    public LoggingFeature loggingFeature() {
+        LoggingFeature loggingFeature = new LoggingFeature();
+        loggingFeature.setPrettyLogging(true);
+        loggingFeature.addBinaryContentMediaTypes(MediaType.APPLICATION_PDF_VALUE);
+        return loggingFeature;
     }
 
-    @Bean
-    public AbstractLoggingInterceptor logOutInterceptorClientSoapMsgLogger() {
-        SoapMessageLoggingOutInterceptor logOutInterceptor = new SoapMessageLoggingOutInterceptor();
-        logOutInterceptor.logSoapMessage(true);
-        logOutInterceptor.setPrettyLogging(true);
-        return logOutInterceptor;
-    }
-    
     /*
      * SoapRawClient for XmlErrorTests
      */    

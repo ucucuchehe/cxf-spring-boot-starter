@@ -9,7 +9,9 @@ import de.codecentric.namespace.weatherservice.Weather;
 import de.codecentric.namespace.weatherservice.WeatherService;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.xml.namespace.QName;
@@ -28,7 +30,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.mockito.Mockito.*;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class WebServiceAutoDetectorTest {
 
     public static final Class WEATHER_SERVICE_ENDPOINT_INTERFACE = WeatherService.class;
