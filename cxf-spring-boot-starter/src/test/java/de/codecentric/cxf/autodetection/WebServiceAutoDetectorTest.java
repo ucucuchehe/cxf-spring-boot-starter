@@ -7,9 +7,11 @@ import de.codecentric.cxf.autodetection.diagnostics.SeiNotFoundException;
 import de.codecentric.cxf.autodetection.diagnostics.WebServiceClientNotFoundException;
 import de.codecentric.namespace.weatherservice.Weather;
 import de.codecentric.namespace.weatherservice.WeatherService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -22,7 +24,6 @@ import java.util.List;
 
 import static de.codecentric.cxf.autodetection.WebServiceAutoDetector.SEI_ANNOTATION;
 import static de.codecentric.cxf.autodetection.WebServiceAutoDetector.WEB_SERVICE_CLIENT_ANNOTATION;
-import static junit.framework.TestCase.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -30,7 +31,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.mockito.Mockito.*;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class WebServiceAutoDetectorTest {
 
     public static final Class WEATHER_SERVICE_ENDPOINT_INTERFACE = WeatherService.class;
@@ -42,13 +43,15 @@ public class WebServiceAutoDetectorTest {
     private String seiAndWebServiceClientPackageName;
     private String seiImplementationPackageName;
 
-    @Before public void
+    @BeforeEach
+    public void
     init() throws BootStarterCxfException {
         seiAndWebServiceClientPackageName = PackageNameReader.build().readSeiAndWebServiceClientPackageNameFromCxfSpringBootMavenProperties();
         seiImplementationPackageName = PackageNameReader.build().readSeiImplementationPackageNameFromCxfSpringBootMavenProperties();
     }
 
-    @Test public void
+    @Test
+    public void
     is_SEI_Successfully_detected() throws BootStarterCxfException {
 
         WebServiceScanner scannerMock = mock(WebServiceScanner.class);
@@ -98,7 +101,7 @@ public class WebServiceAutoDetectorTest {
         assertThat(serviceNameQName.getLocalPart(), is(equalTo(WEATHER_WEBSERVICE_CLIENT.getSimpleName())));
     }
 
-    @Test(expected = SeiImplClassNotFoundException.class) public void
+    @Test() public void
     should_react_with_custom_startup_Failure_Message_console_if_SEI_implementing_class_is_missing() throws BootStarterCxfException {
 
         WebServiceScanner scannerMock = mock(WebServiceScanner.class);
@@ -106,10 +109,10 @@ public class WebServiceAutoDetectorTest {
         ApplicationContext applicationContext = mock(ApplicationContext.class);
         WebServiceAutoDetector autoDetector = new WebServiceAutoDetector(scannerMock, applicationContext);
 
-        autoDetector.searchAndInstantiateSeiImplementation(WEATHER_SERVICE_ENDPOINT_INTERFACE);
+        Assertions.assertThrows(SeiImplClassNotFoundException.class,  () -> autoDetector.searchAndInstantiateSeiImplementation(WEATHER_SERVICE_ENDPOINT_INTERFACE));
     }
 
-    @Test(expected = WebServiceClientNotFoundException.class) public void
+    @Test() public void
     should_react_with_custom_startup_Failure_Message_if_WebServiceClient_annotated_class_is_missing() throws BootStarterCxfException {
 
         WebServiceScanner scannerMock = mock(WebServiceScanner.class);
@@ -117,10 +120,10 @@ public class WebServiceAutoDetectorTest {
         ApplicationContext applicationContext = mock(ApplicationContext.class);
         WebServiceAutoDetector autoDetector = new WebServiceAutoDetector(scannerMock, applicationContext);
 
-        autoDetector.searchAndInstantiateWebServiceClient();
+        Assertions.assertThrows(WebServiceClientNotFoundException.class, autoDetector::searchAndInstantiateWebServiceClient);
     }
 
-    @Test(expected = SeiNotFoundException.class) public void
+    @Test() public void
     should_react_with_custom_startup_Failure_Message_if_SEI_is_missing() throws BootStarterCxfException {
 
         WebServiceScanner scannerMock = mock(WebServiceScanner.class);
@@ -129,7 +132,7 @@ public class WebServiceAutoDetectorTest {
         ApplicationContext applicationContext = mock(ApplicationContext.class);
         WebServiceAutoDetector autoDetector = new WebServiceAutoDetector(scannerMock, applicationContext);
 
-        autoDetector.searchServiceEndpointInterface();
+        Assertions.assertThrows(SeiNotFoundException.class, autoDetector::searchServiceEndpointInterface);
     }
 
     protected static List<String> generateListWithSeiAndSeiImplNameWithBothWebServiceAnnotation() {

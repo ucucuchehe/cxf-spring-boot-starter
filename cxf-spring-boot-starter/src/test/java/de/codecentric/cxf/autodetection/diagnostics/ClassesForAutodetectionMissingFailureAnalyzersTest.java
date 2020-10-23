@@ -3,11 +3,10 @@ package de.codecentric.cxf.autodetection.diagnostics;
 
 import de.codecentric.cxf.common.BootStarterCxfException;
 import de.codecentric.namespace.weatherservice.WeatherService;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.diagnostics.FailureAnalysis;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 
 public class ClassesForAutodetectionMissingFailureAnalyzersTest {
@@ -17,14 +16,15 @@ public class ClassesForAutodetectionMissingFailureAnalyzersTest {
     private SeiMissingFailureAnalyzer seiMissingFailureAnalyzer = new SeiMissingFailureAnalyzer();
 
 
-    @Test public void
+    @Test
+    public void
     does_SeiImplMissing_failure_analysis_contain_correct_description() throws BootStarterCxfException {
 
         SeiImplClassNotFoundException seiNotFoundException = SeiImplClassNotFoundException.build().setNotFoundClassName(WeatherService.class.getName());
 
         FailureAnalysis failureAnalysis = seiImplMissingFailureAnalyzer.analyze(seiNotFoundException);
 
-        assertThat(failureAnalysis.getDescription(), containsString(SeiImplClassNotFoundException.MESSAGE));
+        Assertions.assertThat(failureAnalysis.getDescription()).contains(SeiImplClassNotFoundException.MESSAGE);
     }
 
 
@@ -33,14 +33,14 @@ public class ClassesForAutodetectionMissingFailureAnalyzersTest {
 
         FailureAnalysis failureAnalysis = webServiceClientMissingFailureAnalyzer.analyze(new WebServiceClientNotFoundException());
 
-        assertThat(failureAnalysis.getDescription(), containsString(WebServiceClientNotFoundException.MESSAGE));
+        Assertions.assertThat(failureAnalysis.getDescription()).contains(WebServiceClientNotFoundException.MESSAGE);
     }
 
     @Test public void
     does_SeiMissing_failure_analysis_contain_correct_description() {
         FailureAnalysis failureAnalysis = seiMissingFailureAnalyzer.analyze(new SeiNotFoundException());
 
-        assertThat(failureAnalysis.getDescription(), containsString(SeiNotFoundException.MESSAGE));
+        Assertions.assertThat(failureAnalysis.getDescription()).contains(SeiNotFoundException.MESSAGE);
     }
 
 

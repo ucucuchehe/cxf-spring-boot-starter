@@ -1,7 +1,7 @@
 package de.codecentric.cxf.logging;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class CxfLoggingSoapActionUtilTest {
 
@@ -14,6 +14,6 @@ public class CxfLoggingSoapActionUtilTest {
         String methodNameExtracted = CxfLoggingSoapActionUtil.extractSoapMethodNameFromHttpHeader(exampleSoapHttpHeader);
         
         // Then
-        assertEquals("getWeatherInformation", methodNameExtracted);
+        Assertions.assertThat(methodNameExtracted).isEqualTo("getWeatherInformation");
     }
 }

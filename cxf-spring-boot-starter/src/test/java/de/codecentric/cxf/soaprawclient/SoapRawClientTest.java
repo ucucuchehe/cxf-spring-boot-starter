@@ -4,23 +4,18 @@ import de.codecentric.cxf.TestApplication;
 import de.codecentric.cxf.common.BootStarterCxfException;
 import de.codecentric.cxf.configuration.CxfAutoConfiguration;
 import de.codecentric.namespace.weatherservice.WeatherService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.typeCompatibleWith;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes=TestApplication.class)
 public class SoapRawClientTest {
 
@@ -36,14 +31,14 @@ public class SoapRawClientTest {
         SoapRawClient soapRawClient = new SoapRawClient(falseSoapServiceUrl, WeatherService.class);
         try {
             soapRawClient.callSoapService(GetCityForecastByZIPTestXml.getInputStream());
-            fail();
+            Assertions.fail("An expected exception was not thrown");
         } catch (BootStarterCxfException bootStarterException) {
 
-            assertThat(bootStarterException.getMessage(), containsString(SoapRawClient.ERROR_MESSAGE));
+            assertThat(bootStarterException.getMessage()).contains(SoapRawClient.ERROR_MESSAGE);
 
             Throwable unknownHostException = bootStarterException.getCause();
-            assertThat(unknownHostException.getClass(), is(typeCompatibleWith(IOException.class)));
-            assertThat(unknownHostException.getMessage(), containsString("foobar"));
+            assertThat(unknownHostException).isInstanceOf(UnknownHostException.class);
+            assertThat(unknownHostException.getMessage()).contains("foobar");
         }
     }
 }

@@ -5,26 +5,20 @@ import de.codecentric.cxf.common.XmlUtils;
 import de.codecentric.namespace.weatherservice.WeatherException;
 import de.codecentric.namespace.weatherservice.WeatherService;
 import de.codecentric.namespace.weatherservice.general.GetCityForecastByZIP;
-import org.junit.Ignore;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemOutRule;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-
-@RunWith(SpringRunner.class)
 @SpringBootTest(
         classes = TestApplication.class,
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
@@ -45,7 +39,7 @@ public class SleuthLogMessagesTest {
         callSoapService();
 
         String log = systemOutRule.getLog();
-        assertThat(isSleuthLogLineSomewhereIn(log),is(true));
+        Assertions.assertThat(isSleuthLogLineSomewhereIn(log)).isTrue();
     }
 
     private boolean isSleuthLogLineSomewhereIn(String log) {
@@ -54,13 +48,13 @@ public class SleuthLogMessagesTest {
         return loglineMatcher.find();
     }
 
-    @Ignore
+    @Disabled
     @Test public void
     call_time_should_be_print_out() throws Exception {
         callSoapService();
 
         String log = systemOutRule.getLog();
-        assertThat(log,containsString("Call time"));
+        Assertions.assertThat(log).contains("Call time");
     }
 
     private void callSoapService() throws de.codecentric.cxf.common.BootStarterCxfException, IOException, WeatherException {

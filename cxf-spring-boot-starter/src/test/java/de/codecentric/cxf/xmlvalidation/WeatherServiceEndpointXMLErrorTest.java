@@ -2,24 +2,19 @@ package de.codecentric.cxf.xmlvalidation;
 
 import de.codecentric.cxf.TestApplication;
 import de.codecentric.cxf.common.BootStarterCxfException;
-import de.codecentric.cxf.common.FaultType;
 import de.codecentric.cxf.soaprawclient.SoapRawClient;
 import de.codecentric.cxf.soaprawclient.SoapRawClientResponse;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(
 		classes=TestApplication.class,
 		webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
@@ -121,14 +116,14 @@ public class WeatherServiceEndpointXMLErrorTest {
 		SoapRawClientResponse soapRawResponse = soapRawClient.callSoapService(testFile.getInputStream());
 		
 		// Then
-		assertNotNull(soapRawResponse);
-		assertEquals("500 Internal Server Error expected", 500, soapRawResponse.getHttpStatusCode());
-        assertEquals(customId.getMessage(), soapRawResponse.getFaultstringValue());
-        
-        de.codecentric.namespace.weatherservice.exception.WeatherException weatherException = soapRawResponse.getUnmarshalledObjectFromSoapMessage(de.codecentric.namespace.weatherservice.exception.WeatherException.class);		
-		assertNotNull("<soap:Fault><detail> has to contain a de.codecentric.namespace.weatherservice.exception.WeatherException",  weatherException);
-		
-		assertEquals("ExtremeRandomNumber", weatherException.getUuid());
-		assertEquals("The correct BusinessId is missing in WeatherException according to XML-scheme.", customId.getId(), weatherException.getBusinessErrorId());
+		assertThat(soapRawResponse).isNotNull();
+		assertThat(soapRawResponse.getHttpStatusCode()).isEqualTo(500);
+		assertThat(soapRawResponse.getFaultstringValue()).isEqualTo(customId.getMessage());
+
+		de.codecentric.namespace.weatherservice.exception.WeatherException weatherException = soapRawResponse.getUnmarshalledObjectFromSoapMessage(de.codecentric.namespace.weatherservice.exception.WeatherException.class);
+		assertThat(weatherException).isNotNull().describedAs("<soap:Fault><detail> has to contain a de.codecentric.namespace.weatherservice.exception.WeatherException");
+
+		assertThat(weatherException.getUuid()).isEqualTo("ExtremeRandomNumber");
+		assertThat(customId.getId()).isEqualTo(weatherException.getBusinessErrorId()).describedAs("The correct BusinessId is missing in WeatherException according to XML-scheme.");
 	}
 }

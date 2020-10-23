@@ -1,6 +1,6 @@
 package de.codecentric.cxf.autodetection.diagnostics;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.diagnostics.FailureAnalysis;
 
 import java.io.FileNotFoundException;
@@ -13,7 +13,8 @@ public class CxfSpringBootMavenPropertiesMissingFailureAnalyzerTest {
     private CxfSpringBootMavenPropertiesMissingFailureAnalyzer cxfSpringBootMavenPropertiesMissingFailureAnalyzer = new CxfSpringBootMavenPropertiesMissingFailureAnalyzer();
 
 
-    @Test public void
+    @Test
+    public void
     should_react_with_cxf_spring_boot_maven_properties_missing_failure_analyzer() throws CxfSpringBootMavenPropertiesNotFoundException {
         FailureAnalysis failureAnalysis = cxfSpringBootMavenPropertiesMissingFailureAnalyzer.analyze(new CxfSpringBootMavenPropertiesNotFoundException(
                 "Could not read packageNames from cxf-spring-boot-maven.properties.", new FileNotFoundException()));
